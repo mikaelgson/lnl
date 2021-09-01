@@ -11,6 +11,8 @@ export default async function relatedProductsHandler(req: NextApiRequest, res: N
     const exclude = req.query.exclude as string
     const category = await getCategoryByName(req.query.category as string) // This route would not be hit unless the query is defined
 
+    res.setHeader("Cache-Control", `s-maxage=10, stale-while-revalidate`)
+
     return res
       .status(200)
       .json(
