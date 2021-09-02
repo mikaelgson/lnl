@@ -45,10 +45,15 @@ const CategoryPageTemplate: FC<Props> = ({ category, result }) => {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
+export const getServerSideProps: GetServerSideProps = async ({ res, params, query }) => {
   const { slug } = params as { slug: string }
   const { sort } = query as { sort: string }
   const [result, categories] = await Promise.all([getCategoryByName(slug, sort), getCategories()])
+
+  res.setHeader(
+    "Cache-Control",
+    `s-maxage=${process.env.STALE_WHILE_REVALIDATE_TTL ?? 1}, stale-while-revalidate`
+  )
 
   return {
     props: {
