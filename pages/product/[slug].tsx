@@ -30,7 +30,7 @@ const ProductPageTemplate: FC<Props> = ({
       <Grid>
         <Heading as="h2">More from this category</Heading>
         {!error && !loading ? (
-          <ProductList products={data}></ProductList>
+          <ProductList products={data.products}></ProductList>
         ) : (
           <Flex sx={{ minHeight: 264, alignItems: "center", justifyContent: "center" }}>
             <Spinner></Spinner>
@@ -42,9 +42,9 @@ const ProductPageTemplate: FC<Props> = ({
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const popuplarProducts = await getProducts()
+  const allProducts = await getProducts()
 
-  const paths = popuplarProducts.map(({ id }) => ({
+  const paths = allProducts.map(({ id }) => ({
     params: {
       slug: id.toString(),
     },

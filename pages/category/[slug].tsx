@@ -1,50 +1,61 @@
-import { Grid, Heading } from "@theme-ui/components"
-import { GetStaticPaths, GetStaticProps } from "next"
-import { FC } from "react"
+/** @jsxImportSource theme-ui */
+
+import { Grid, Heading, Select } from "@theme-ui/components"
+import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next"
+import { Router, useRouter } from "next/dist/client/router"
+import { FC, useCallback, useEffect, useState } from "react"
 import ProductList from "../../components/ProductList"
 import { getCategories, getCategoryByName } from "../../lib/store"
-import { Product } from "../../types"
+import { CategoryResult, Product, SortOption } from "../../types"
 
 type Props = {
-  products: Product[]
+  result: CategoryResult
   category: string
 }
 
-const CategoryPageTemplate: FC<Props> = ({ category, products }) => {
+const CategoryPageTemplate: FC<Props> = ({ category, result }) => {
+  const router = useRouter()
+  const [value, setValue] = useState<string>(result.query.active ? result.query.active : "popular")
+
+  const onSortOptionChanged = useCallback(
+    (e) => {
+      setValue(e.target.value)
+
+      router.push(
+        `/category/${category}?${new URLSearchParams({
+          sort: e.target.value,
+        })}`
+      )
+    },
+    [router, value]
+  )
+
   return (
     <Grid>
+      <Select value={value} onChange={onSortOptionChanged} sx={{ textTransform: "capitalize" }}>
+        {result.query.options.map((item) => (
+          <option key={item} value={item}>
+            {item}
+          </option>
+        ))}
+      </Select>
       <Heading as="h1">{category}</Heading>
-      <ProductList products={products} />
+      <ProductList products={result.products} />
     </Grid>
   )
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const allCategories = await getCategories()
-
-  const paths = allCategories.map((category) => ({
-    params: {
-      slug: category,
-    },
-  }))
-
-  return {
-    paths,
-    fallback: "blocking",
-  }
-}
-
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
   const { slug } = params as { slug: string }
-  const [products, categories] = await Promise.all([getCategoryByName(slug), getCategories()])
+  const { sort } = query as { sort: string }
+  const [result, categories] = await Promise.all([getCategoryByName(slug, sort), getCategories()])
 
   return {
     props: {
-      products,
+      result,
       category: slug,
       categories,
     },
-    revalidate: 10,
   }
 }
 

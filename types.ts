@@ -6,3 +6,13 @@ export type Product = {
   description: string
   image: string
 }
+
+export type CategoryResult = {
+  products: Product[]
+  query: {
+    active: SortOption | string
+    options: SortOption[]
+  }
+}
+
+export type SortOption = "price" | "popular" | "title"
