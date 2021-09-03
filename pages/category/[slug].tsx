@@ -50,10 +50,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, params, quer
   const { sort } = query as { sort: string }
   const [result, categories] = await Promise.all([getCategoryByName(slug, sort), getCategories()])
 
-  res.setHeader(
-    "Cache-Control",
-    `s-maxage=${process.env.STALE_WHILE_REVALIDATE_TTL ?? 1}, stale-while-revalidate`
-  )
+  res.setHeader("Cache-Control", `s-maxage=10, stale-while-revalidate`)
 
   return {
     props: {

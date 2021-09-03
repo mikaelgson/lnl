@@ -8,8 +8,11 @@ export default async function relatedProductsHandler(req: NextApiRequest, res: N
       return res.status(405).json({ error: `Method: ${req.method} Not Allowed` })
     }
 
-    const exclude = req.query.exclude as string
-    const result = await getCategoryByName(req.query.category as string) // This route would not be hit unless the query is defined
+    const result = await getCategoryByName(
+      Array.isArray(req.query.category) ? req.query.category[0] : req.query.category,
+      undefined,
+      Array.isArray(req.query.exclude) ? req.query.catexcludeegory[0] : req.query.exclude
+    )
 
     res.setHeader("Cache-Control", `s-maxage=10, stale-while-revalidate`)
 

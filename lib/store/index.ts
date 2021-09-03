@@ -23,7 +23,7 @@ export const getCategories = async () => {
   return json
 }
 
-export const getCategoryByName = async (name: string, sort?: string, exclude?: number) => {
+export const getCategoryByName = async (name: string, sort?: string, exclude?: number | string) => {
   const response = await fetch(`https://fakestoreapi.com/products/category/${name}`)
   const json: Product[] = await response.json()
   const sortOptions: SortOption[] = ["popular", "price", "title"]
